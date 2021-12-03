@@ -1,0 +1,39 @@
+.message-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    .message-item {
+       
+        flex: 1 1 auto;
+    
+        position: relative;
+        text-align: left;
+        margin-right: 12px;
+        background-color: #ffff;
+        padding: 12px;
+        border-radius: 8px;
+        word-break: break-all;
+        &::after {
+            content: ' ';
+            position: absolute;
+            display: block;
+            border: 10px solid #fff;
+            right: -18px;
+            top: 50%;
+            margin-top: -10px;
+            border-color: transparent transparent transparent white;
+        }
+    }
+    .avator {
+        flex: 0 0 40px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-position: center center;
+        background-size: 80px 80px;
+        background-image: url('https://img.alicdn.com/imgextra/i4/O1CN01k1ImwW1obngyTKEGU_!!6000000005244-2-tps-726-727.png');
+
+    }
+
+}

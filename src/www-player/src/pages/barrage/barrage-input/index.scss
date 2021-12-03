@@ -1,0 +1,18 @@
+.barrage-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    background-color: #fff;
+    .barrage-input {
+       flex : 1 1 auto;
+       margin-right: 12px;
+    }
+    .barrage-btn {
+        display: 0 0 120px;
+    }
+}

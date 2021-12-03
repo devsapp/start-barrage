@@ -1,0 +1,10 @@
+Type: Application
+Name: 名称
+Version: 0.0.1
+Category: 云应用
+HomePage: '''https://github.com/devsapp/start-barrage'
+Tags:
+  - 弹幕应用
+  - serverless架构
+  - 云应用
+Description: serverless架构的弹幕应用

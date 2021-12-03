@@ -1,0 +1,23 @@
+{
+  "name": "index",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "serve": "sandbox"
+  },
+  "dependencies": {
+    "@serverless-devs/dk": "latest",
+    "aliyun-api-gateway": "^1.1.6",
+    "axios": "^0.24.0",
+    "koa-bodyparser": "^4.3.0",
+    "lodash.get": "^4.4.2",
+    "tablestore": "^5.0.7"
+  },
+  "devDependencies": {
+    "@serverless-devs/sandbox": "latest"
+  }
+}

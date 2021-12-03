@@ -1,0 +1,29 @@
+.barrage-topbar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    height: 40px;
+    .edit-container {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        justify-content: center;
+        .name-btn {
+            margin-left: 12px;
+        }
+        .name-input ,
+        .name-input > input{
+            border: none;
+            height: 28px;
+            line-height: 28px;
+        }
+        .name-tag {
+            font-weight: bold;
+            font-size: 16px;
+            margin-right: 4px;
+            color: blue
+        }
+    }
+}
