@@ -1,5 +1,6 @@
 edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
 name: barrage #  项目名称
+access: {{access|请输入秘钥别名如default}}
 vars:
   domain: {{domain|请输入自定义域名}}
   region: cn-hongkong
@@ -12,8 +13,8 @@ vars:
     admin: admin
     screen: screen
   tablestore:
+    endpoint: {{endpoint|请输入tablestore实例的公网访问地址}}
     instance: {{instance|请输入tablestore实例名}}
-    endpoint:: {{endpoint|请输入tablestore实例的公网访问地址}}
   gateway:
     groupName: barrage
 services:
