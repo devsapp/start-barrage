@@ -15,7 +15,7 @@ lerna-debug.log*
 .DS_Store
 
 # IDEs and editors
-# .env
+.env
 /.idea
 .project
 .classpath
