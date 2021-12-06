@@ -2,6 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 const YAML = require('yaml');
+const { execSync } = require('child_process');
 const DCT_INTEGER = 1;
 const DCT_DOUBLE = 2;
 const DCT_BOOLEAN = 3;
@@ -10,14 +11,17 @@ const DCT_STRING = 4;
 async function preInit(inputObj) {
 
 }
-
+/**
+ * 初始化表如果已经初始化则忽略
+ * @param {} inputObj 
+ */
 async function postInit(inputObj) {
 
     const s = path.join(inputObj.targetPath, 's.yaml'); // 拿到 access, tablestore endpoint, instanceName
     const _file = fs.readFileSync(s, 'utf8')
     const data = YAML.parse(_file);
     const { access, vars } = data;
-    const { endpont, instance } = vars.tablestore;
+    const { endpoint, instance } = vars.tablestore;
     const commontData = {
         reservedThroughput: {
             capacityUnit: {
@@ -134,21 +138,18 @@ async function postInit(inputObj) {
     const equipment_params = Object.assign(equipment, commontData);
     const interceptor_params = Object.assign(interceptor, commontData);
     const barrage_params = Object.assign(barrage, commontData);
-
-
-    const e_shell = `s cli /Users/hanxie/opensource/devsapp/tablestore createTable -a ${access} endpoint ${endpoint} instance ${instance} -p ${JSON.stringify(equipment_params)}`;
-    //    const equipment_result = await tableClient.createTable(equipment_params);
-    //    const interceptor_result = await tableClient.createTable(interceptor_params);
-    //    const barrage_result = await tableClient.createTable(barrage_params);
-
+    const e_shell1 = `s cli tablestore createTable -p '${JSON.stringify(equipment_params)}' -a ${access} endpoint ${endpoint} instance ${instance}`; //创建 equipment 表
+    const e_shell2 = `s cli tablestore createTable -p '${JSON.stringify(interceptor_params)}' -a ${access} endpoint ${endpoint} instance ${instance}`; //创建 inteceptor 表
+    const e_shell3 = `s cli tablestore insertTable -p '${JSON.stringify({ filterWords: '', status: 0 })}' -a ${access} endpoint ${endpoint} instance ${instance} primaryKey id primaryValue 1 tablename interceptor`;  //插入 interceptor 数据
+    const e_shell4 = `s cli tablestore createTable -p '${JSON.stringify(barrage_params)}' -a ${access} endpoint ${endpoint} instance ${instance}`; //创建 barrage 表
+    const result1 = execSync(e_shell1);
+    const result2 = execSync(e_shell2);
+    const result3 = execSync(e_shell3);
+    const result4 = execSync(e_shell4);
 }
 
-// module.exports = {
-//     postInit,
-//     preInit
-// }
+module.exports = {
+    postInit,
+    preInit
+}
 
-
-postInit({
-    targetPath: '/Users/hanxie/localproject/s-app/barrage2'
-})
