@@ -1,25 +1,24 @@
 
 const path = require('path');
 const fs = require('fs');
-const YAML = require('yaml');
 const { execSync } = require('child_process');
+const yaml = require('./yaml');
 const DCT_INTEGER = 1;
-const DCT_DOUBLE = 2;
-const DCT_BOOLEAN = 3;
 const DCT_STRING = 4;
 
 async function preInit(inputObj) {
 
 }
+
 /**
  * 初始化表如果已经初始化则忽略
  * @param {} inputObj 
  */
-async function postInit(inputObj) {
 
+async function postInit(inputObj) {
     const s = path.join(inputObj.targetPath, 's.yaml'); // 拿到 access, tablestore endpoint, instanceName
-    const _file = fs.readFileSync(s, 'utf8')
-    const data = YAML.parse(_file);
+    const _file = fs.readFileSync(s, 'utf8');
+    const data = yaml.load(_file);
     const { access, vars } = data;
     const { endpoint, instance } = vars.tablestore;
     const commontData = {
@@ -146,6 +145,7 @@ async function postInit(inputObj) {
     const result2 = execSync(e_shell2);
     const result3 = execSync(e_shell3);
     const result4 = execSync(e_shell4);
+    console.log('init tablestore success');
 }
 
 module.exports = {
