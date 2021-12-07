@@ -141,11 +141,19 @@ async function postInit(inputObj) {
     const e_shell2 = `s cli tablestore createTable -p '${JSON.stringify(interceptor_params)}' -a ${access} endpoint ${endpoint} instance ${instance}`; //创建 inteceptor 表
     const e_shell3 = `s cli tablestore insertTable -p '${JSON.stringify({ filterWords: '', status: 0 })}' -a ${access} endpoint ${endpoint} instance ${instance} primaryKey id primaryValue 1 tablename interceptor`;  //插入 interceptor 数据
     const e_shell4 = `s cli tablestore createTable -p '${JSON.stringify(barrage_params)}' -a ${access} endpoint ${endpoint} instance ${instance}`; //创建 barrage 表
+    console.log('start to create table equpiment');
     const result1 = execSync(e_shell1);
+    console.log('result: ' + result1.toString());
+    console.log('start to create table inteceptor');
     const result2 = execSync(e_shell2);
+    console.log('result: ' + result2.toString());
+    console.log('start to insert into table inteceptor');
     const result3 = execSync(e_shell3);
+    console.log('result: ' + result3.toString());
+    console.log('start to create table barrage');
     const result4 = execSync(e_shell4);
-    console.log('init tablestore success');
+    console.log('result: ' + result4.toString());
+    console.log('init start-barrage done');
 }
 
 module.exports = {
