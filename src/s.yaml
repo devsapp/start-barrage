@@ -2,19 +2,19 @@ edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic V
 name: barrage #  项目名称
 access: default
 vars:
-  domain: '{{custome-domain}}' #到万网注册一个即可
+  domain: '{{custome_domain}}' #到万网注册一个即可
   region: cn-hongkong
   fc:
     baseUrl: "" #函数计算触发器地址，可以在部署好函数之后获得。例子： https://xxx.cn-hongkong.fc.aliyuncs.com/2016-08-15/proxy/serverlesshub/serverlesshub/
   oss:
     baseUrl: https://${vars.oss.bucketName}.oss-cn-hongkong.aliyuncs.com #oss 公网访问地址 。例子： https://<bucketname>.oss-cn-hongkong.aliyuncs.com
-    bucketName: '{{oss-bucketName}}' 
+    bucketName: '{{oss_bucketName}}' 
     player: player
     admin: admin
     screen: screen
   tablestore:
-    endpoint: '{{tablestore-endpoint}}'
-    instance: '{{tablestore-instance}}'
+    endpoint: '{{tablestore_endpoint}}'
+    instance: '{{tablestore_instance}}'
   gateway:
     groupName: serverless-barrage
 services:

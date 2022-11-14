@@ -12,25 +12,25 @@ Parameters: # 标准的JSON Scheme
   type: 'object'
   additionalProperties: false # 不允许增加其他属性
   required: # 必填项
-      - custome-domain
-      - oss-bucketName
-      - tablestore-endpoint
-      - tablestore-instance
+      - custome_domain
+      - oss_bucketName
+      - tablestore_endpoint
+      - tablestore_instance
   properties:
-    custome-domain: 
+    custome_domain: 
       type: string
       description: 在万网上申请的自定义域名，可以在dns控制台进行配置 # 描述
       title: 自定义域名
       pattern: '^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$' # 正则表达式
-    oss-bucketName: 
+    oss_bucketName: 
       type: string 
       description: 阿里云oss存储桶名称 
       title: alibaba cloud oss bucketName
-    tablestore-instance: 
+    tablestore_instance: 
       type: string 
       description: 阿里云tablestore实例名 
       title: alibaba cloud tablestore instance 
-    tablestore-endpoint: 
+    tablestore_endpoint: 
       type: string 
       description: 阿里云tablestore访问接入点
       title: alibaba cloud tablestore endpoint
