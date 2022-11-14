@@ -16,42 +16,66 @@ vars:
     endpoint: {{endpoint|请输入tablestore实例的公网访问地址}}
     instance: {{instance|请输入tablestore实例名}}
   gateway:
-    groupName: barrage
+    groupName: serverless-barrage
 services:
-  screen:
-    component: devsapp/OSS # (必填) 引用 component 的名称
+  www-screen: #大屏幕应用
+    component: oss # (必填) 引用 component 的名称
+    actions:
+      pre-deploy:
+        - run: npm i && npm run build
+          path: www-screen
     props:
       region: ${vars.region}
       bucket: ${vars.oss.bucketName}
-      ossObject: screen # 指定目录
+      subDir: 'www-screen'  
+      acl: public-read # 读写权限
       codeUri: www-screen/build
+      website:
+        index: index.html 
+        error: 404.html 
+        subDirType: redirect 
+  www-player: #玩家应用
+    component: oss # (必填) 引用 component 的名称
+    actions:
+      pre-deploy:
+        - run: npm i && npm run build
+          path: www-player
+    props:
+      region: ${vars.region}
+      bucket: ${vars.oss.bucketName}
+      subDir: 'www-player'
       acl: public-read
-  player:
-    component: devsapp/OSS # (必填) 引用 component 的名称
-    props:
-      region: ${vars.region}
-      bucket: ${vars.oss.bucketName}
-      ossObject: player # 指定目录
       codeUri: www-player/build
-      acl: public-read 
-  admin:
-    component: devsapp/OSS # (必填) 引用 component 的名称
+      website:
+        index: index.html 
+        error: 404.html 
+        subDirType: redirect 
+  www-admin: #管理员应用
+    component: oss # (必填) 引用 component 的名称
+    actions:
+      pre-deploy:
+        - run: npm i && npm run build
+          path: www-admin
     props:
       region: ${vars.region}
       bucket: ${vars.oss.bucketName}
-      ossObject: admin # 指定目录
+      subDir: 'www-admin' # 指定目录
       codeUri: www-admin/build
-      acl: public-read 
-  http-control-center:
-    component: devsapp/fc # 组件名称
+      acl: public-read
+    website:
+        index: index.html 
+        error: 404.html 
+        subDirType: redirect
+  function-control-center:  #后台函数控制中心，这是多函数服务
+    component: fc # 组件名称
     actions: 
-      pre-deploy: # 安装好依赖后可以注释掉
+      pre-deploy: 
         - run: npm install
-          path: http-control-center
+          path: function-control-center
     props:
       region: ${vars.region}
       service:
-        name: barrage-control
+        name: serverless-barrage
         description: 弹幕效果后台
         internetAccess: true
         role:
@@ -86,8 +110,8 @@ services:
           protocol: HTTP
           routeConfigs:
             - path: /*
-  event-register:
-    component: devsapp/fc # 组件名称
+  function-equipment-register: #设备注册 ，这是一个单函数服务
+    component: fc # 组件名称
     actions:  
       pre-deploy:  # 安装好依赖后可以注释掉
         - run: npm install
@@ -95,8 +119,8 @@ services:
     props:
       region: ${vars.region}
       service:
-        name: barrage-register
-        description: register screen
+        name: serverless-barrage
+        description: 注册设备
         internetAccess: true
         role:
           name: tablestore
@@ -114,15 +138,15 @@ services:
         initializer: index.initializer
         memorySize: 128
         timeout: 60
-  gateway:
-    component: apigateway # 这里引入的是相对路径，正式配置替换成你自己的component名称即可
+  api-gateway:  #路由网关
+    component: apigateway 
     props:
       regionId: ${vars.region}
       customerDomain: ${vars.domain} # 客户自定义域名
       groupName: ${vars.gateway.groupName} #指定分组 这里你可以分开设置环境
       stageName: RELEASE
       apis:
-        - apiName: notify
+        - apiName: message-notify
           regionId: ${vars.region}
           webSocketApiType: NOTIFY
           requestConfig:
@@ -132,12 +156,12 @@ services:
             requestMode: MAPPING
             bodyFormat: STREAM
           serviceConfig:
-            servicePath: /
+            servicePath: /notify
             serviceProtocol: HTTP
             serviceAddress: http://www.aliyun.com
             contentTypeCatagory: DEFAULT
             contentTypeValue: 'application/json; charset=UTF-8'
-        - apiName: register
+        - apiName: equipment-register
           regionId: ${vars.region}
           webSocketApiType: REGISTER
           requestConfig:
@@ -151,131 +175,61 @@ services:
             serviceProtocol: FunctionCompute
             functionComputeConfig:
               fcRegionId: ${vars.region}
-              serviceName: barrage-register
+              serviceName: serverless-barrage
               functionName: register
               fcType: FCEvent
-              selectServiceName: barrage-register
+              selectServiceName: serverless-barrage
               selectFunctionName: register
               fcBaseUrl: ''
             resultType: JSON
-        - apiName: barrageapi_get
+        - apiName: barrage-control-center
           regionId: ${vars.region}
           requestConfig:
             requestPath: /api/*
-            requestHttpMethod: GET
+            requestHttpMethod: ANY
             requestMode: PASSTHROUGH
           serviceConfig:
             servicePath: /
             serviceProtocol: FunctionCompute
             functionComputeConfig:
               fcRegionId: ${vars.region}
-              fcBaseUrl: ${http-control-center.output.url.system_url} # 或者直接使用 fcbaseurl
-              onlyBusinessPath: true
+              fcBaseUrl: ${function-control-center.output.url.system_url} # 或者直接使用 fcbaseurl
+              onlyBusinessPath: false
               contentTypeCatagory: CLIENT
               path: /
             resultType: JSON
-        - apiName: barrageapi_post
-          regionId: ${vars.region}
-          requestConfig:
-            requestPath: /api/*
-            requestHttpMethod: POST
-            requestMode: PASSTHROUGH
-          serviceConfig:
-            servicePath: /
-            serviceProtocol: FunctionCompute
-            functionComputeConfig:
-              fcRegionId: ${vars.region}
-              fcBaseUrl: ${http-control-center.output.url.system_url} # 或者直接使用 fcbaseurl
-              onlyBusinessPath: true
-              contentTypeCatagory: CLIENT
-              path: /
-            resultType: JSON
-        - apiName: barrageapi_put
-          regionId: ${vars.region}
-          requestConfig:
-            requestPath: /api/*
-            requestHttpMethod: PUT
-            requestMode: PASSTHROUGH
-          serviceConfig:
-            servicePath: /
-            serviceProtocol: FunctionCompute
-            functionComputeConfig:
-              fcRegionId: ${vars.region}
-              fcBaseUrl: ${http-control-center.output.url.system_url} # 或者直接使用 fcbaseurl
-              onlyBusinessPath: true
-              contentTypeCatagory: CLIENT
-              path: /
-            resultType: JSON      
-        - apiName: player_assets
+        - apiName: www-player
           regionId: ${vars.region}
           requestConfig:
             requestPath: /player/*
             requestHttpMethod: GET
           serviceConfig:
             serviceAddress: ${vars.oss.baseUrl}
-            aoneAppName: cloudapi-openapi
-            servicePath: /${vars.oss.player}/
-            serviceHttpMethod: ANY
-            serviceProtocol: HTTP
-            resultType: JSON
-        - apiName: player_index
-          regionId: ${vars.region}
-          requestConfig:
-            requestPath: /player
-            requestHttpMethod: GET
-          serviceConfig:
-            aoneAppName: cloudapi-openapi
-            serviceAddress: ${vars.oss.baseUrl}
-            servicePath: /${vars.oss.player}/index.html
+            servicePath: /${vars.oss.player}/*
             serviceHttpMethod: GET
             serviceProtocol: HTTP
             resultType: JSON
-        - apiName: admin_assets
+        - apiName: www-admin
           regionId: ${vars.region}
           requestConfig:
             requestPath: /admin/*
             requestHttpMethod: GET
           serviceConfig:
             serviceAddress: ${vars.oss.baseUrl}
-            aoneAppName: cloudapi-openapi
-            servicePath: /${vars.oss.admin}/
-            serviceHttpMethod: ANY
-            serviceProtocol: HTTP
-            resultType: JSON
-        - apiName: admin_index
-          regionId: ${vars.region}
-          requestConfig:
-            requestPath: /admin
-            requestHttpMethod: GET
-          serviceConfig:
-            aoneAppName: cloudapi-openapi
-            serviceAddress: ${vars.oss.baseUrl}
-            servicePath: /${vars.oss.admin}/index.html
+            servicePath: /${vars.oss.admin}/*
             serviceHttpMethod: GET
             serviceProtocol: HTTP
             resultType: JSON
-        - apiName: screen_assets
+        - apiName: www-screen
           regionId: ${vars.region}
           requestConfig:
             requestPath: /*
-            requestHttpMethod: GET
+            requestHttpMethod: ANY
+            requestProtocol: 'HTTP,HTTPS,WS'
           serviceConfig:
             serviceAddress: ${vars.oss.baseUrl}
-            aoneAppName: cloudapi-openapi
             servicePath: /${vars.oss.screen}/
             serviceHttpMethod: ANY
-            serviceProtocol: HTTP
-            resultType: JSON
-        - apiName: screen_index
-          regionId: ${vars.region}
-          requestConfig:
-            requestPath: /
-            requestHttpMethod: GET
-          serviceConfig:
-            aoneAppName: cloudapi-openapi
-            serviceAddress: ${vars.oss.baseUrl}
-            servicePath: /${vars.oss.screen}/index.html
-            serviceHttpMethod: GET
             serviceProtocol: HTTP
             resultType: JSON
   dns:  
